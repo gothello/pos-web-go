@@ -37,8 +37,27 @@ func formatJson(w hhtp.ResponseWriter, message interface{}, status int){
 	json.NewEncoder(w).Encode(message)
 }
 
-func formatError(w http.ResponseWriter, err error, code int){
-	formatJson(w, map[string]string{"error": err.String()})
+func formatError(w http.ResponseWriter, messageErr, code int){
+	formatJson(w, map[string]string{"error": messageErr})
+}
+
+func getBeer(service beer.UseCase) {
+	return http.HandlerFunc(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r.Body)
+		id, err := strconv.ParseInt(vars["id"], 10, 64)
+		if err != nil {
+			formatError(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		b, err := service.Get(id)
+		if err != nil {
+			formatError(w, err.Error(), http.StatusNotFound)
+			return
+		}
+
+		formatJson(w, b, http.StatusOK)
+	}
 }
 
 func getAllBeer(service beer.UseCase) http.Handler{

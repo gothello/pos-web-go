@@ -44,22 +44,6 @@ func formatError(w http.ResponseWriter, messageErr string, code int) {
 	formatJson(w, map[string]string{"error": messageErr}, code)
 }
 
-func getBeer(service beer.UseCase) http.Handler {
-p.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-beer.Beer
- json.NewDecoder(r.Body).Decode(&b)
- != nil {
-rmatError(w, err.Error(), http.StatusBadRequest)
-turn
-
-service.Store(&b)
- != nil {
-rmatError(w, err.Error(), http.StatusInternalServerError)
-turn
-
-Json(w, nil, http.StatusCreated)
-
-
 func getBeer(service beer.UseCase) {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r.Body)
@@ -91,9 +75,9 @@ func getAllBeer(service beer.UseCase) http.Handler {
 	})
 }
 
-func storeBeer(service beer.UseCase) http.Handler{
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){
-		var b berr.Beer
+func storeBeer(service beer.UseCase) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var b beer.Beer
 
 		err := json.NewDecoder(r.Body).Decode(&b)
 		if err != nil {
@@ -107,12 +91,12 @@ func storeBeer(service beer.UseCase) http.Handler{
 			return
 		}
 
-		formatError(w, nil, http.StatusCreated)
+		formatError(w, "ok", http.StatusCreated)
 	})
 }
 
 func updateBeer(service beer.UseCase) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var b beer.Beer
 
 		err := json.NewDecoder(r.Body).Decode(&b)
@@ -136,7 +120,7 @@ func updateBeer(service beer.UseCase) http.Handler {
 			return
 		}
 
-		http.WriteHeader(http.StatusOK)
+		w.WriteHeader(http.StatusOK)
 	})
 }
 
@@ -153,6 +137,6 @@ func removeBeer(service beer.UseCase) http.Handler {
 		if err != nil {
 			formatError(w, err.Error(), http.StatusInternalServerError)
 			return
-		} 
+		}
 	})
 }

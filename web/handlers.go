@@ -7,10 +7,11 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/gothello/pos-web-go/beer"
+	"github.com/gothello/pos-web-go/core/beer"
 	"github.com/urfave/negroni"
 )
 
-func GetBeerHandlers(r *mux.Router, n *negroni.Negroni, s beer.UseCase) {
+func GetBeerHandlers(r *mux.Router, n *negroni.Negroni, service beer.UseCase) {
 	n.Handle("/v1/beer", n.With(
 		negroni.Wrap(getAllBeer(service)),
 	)).Methods("GET", "OPTIONS")
@@ -43,6 +44,22 @@ func formatError(w http.ResponseWriter, messageErr string, code int) {
 	formatJson(w, map[string]string{"error": messageErr}, code)
 }
 
+func getBeer(service beer.UseCase) http.Handler {
+p.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+beer.Beer
+ json.NewDecoder(r.Body).Decode(&b)
+ != nil {
+rmatError(w, err.Error(), http.StatusBadRequest)
+turn
+
+service.Store(&b)
+ != nil {
+rmatError(w, err.Error(), http.StatusInternalServerError)
+turn
+
+Json(w, nil, http.StatusCreated)
+
+
 func getBeer(service beer.UseCase) {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r.Body)
@@ -71,5 +88,71 @@ func getAllBeer(service beer.UseCase) http.Handler {
 		}
 
 		formatJson(w, all, http.StatusOK)
+	})
+}
+
+func storeBeer(service beer.UseCase) http.Handler{
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){
+		var b berr.Beer
+
+		err := json.NewDecoder(r.Body).Decode(&b)
+		if err != nil {
+			formatError(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		err = service.Store(&b)
+		if err != nil {
+			formatError(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		formatError(w, nil, http.StatusCreated)
+	})
+}
+
+func updateBeer(service beer.UseCase) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){
+		var b beer.Beer
+
+		err := json.NewDecoder(r.Body).Decode(&b)
+		if err != nil {
+			formatError(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		vars := mux.Vars(r.Body)
+		id, err := strconv.ParseInt(vars["id"], 10, 64)
+		if err != nil {
+			formatError(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		b.ID = id
+
+		err = service.Update(&b)
+		if err != nil {
+			formatError(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		http.WriteHeader(http.StatusOK)
+	})
+}
+
+func removeBeer(service beer.UseCase) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r.Body)
+		id, err := strconv.ParseInt(vars["id"], 10, 64)
+		if err != nil {
+			formatError(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		err = service.Remove(id)
+		if err != nil {
+			formatError(w, err.Error(), http.StatusInternalServerError)
+			return
+		} 
 	})
 }

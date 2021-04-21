@@ -1,18 +1,18 @@
 package beer_test
 
 import (
-
-	"testing"
 	"database/sql"
+	"testing"
+
 	"github.com/gothello/pos-web-go/beer"
 )
 
 func TestStore(t *testing.T) {
 
 	b := &beer.Beer{
-		ID: 1,
-		Name: "cerveja 1",
-		Type: beer.TypeLager,
+		ID:    1,
+		Name:  "cerveja 1",
+		Type:  beer.TypeLager,
 		Style: beer.StylePale,
 	}
 
@@ -25,12 +25,12 @@ func TestStore(t *testing.T) {
 
 	service := beer.NewService(db)
 
-	err := db.Store(b)
+	err = service.Store(b)
 	if err != nil {
 		t.Fatalf("Erro salvando no banco de dados: %s", err.Error())
 	}
 
-	saved, err := db.Get(1)
+	saved, err := service.Get(1)
 	if err != nil {
 		t.Fatalf("Erro buscando no banco de dados: %s", err.Error())
 	}

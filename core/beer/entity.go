@@ -1,33 +1,32 @@
 package beer
 
 type Beer struct {
-	ID int64 `json: "id"`
-	Name string `json: "name"`
-	Type BeerType `json: "type"`
+	ID    int64     `json: "id"`
+	Name  string    `json: "name"`
+	Type  BeerType  `json: "type"`
 	Style BeerStyle `json: "style"`
 }
 
 type BeerType int
 
 const (
-
 	TypeAle = iota + 1
 	TypeLager
 	TypeMalt
 	TypeStout
 )
 
-func(t BeerType) String() string {
+func (t BeerType) String() string {
 
 	switch t {
-		case TypeAle:
-			return "Ale"
-		case TypeLarger:
-			return "Lager"
-		case TypeMalt:
-			return "Malt"
-		case TypeStout:
-			return "Stout"
+	case TypeAle:
+		return "Ale"
+	case TypeLager:
+		return "Lager"
+	case TypeMalt:
+		return "Malt"
+	case TypeStout:
+		return "Stout"
 	}
 
 	return "Unknown"
@@ -36,7 +35,6 @@ func(t BeerType) String() string {
 type BeerStyle int
 
 const (
-
 	StyleAmber = iota + 1
 	StyleBlonde
 	StyleBrown
@@ -88,6 +86,6 @@ func (t BeerStyle) String() string {
 	case StyleHoney:
 		return "Honey"
 	}
-	
+
 	return "Unknown"
-} 
+}

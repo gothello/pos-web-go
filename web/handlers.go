@@ -37,7 +37,7 @@ func formatJson(w hhtp.ResponseWriter, message interface{}, status int){
 	json.NewEncoder(w).Encode(message)
 }
 
-formatError(w http.ResponseWriter, err error, code int){
+func formatError(w http.ResponseWriter, err error, code int){
 	formatJson(w, map[string]string{"error": err.String()})
 }
 

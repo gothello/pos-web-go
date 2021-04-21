@@ -16,7 +16,7 @@ func TestStore(t *testing.T) {
 		Style: beer.StylePale,
 	}
 
-	db, err := sql.Open("sqlite3", "../data/beer.db")
+	db, err := sql.Open("sqlite3", "../data/beer_test.db")
 	if err != nil {
 		t.Fatalf("Erro conectando ao banco de dados: %s", err.Error())
 	}

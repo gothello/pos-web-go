@@ -30,8 +30,25 @@ func GetBeerHandlers(r *mux.Router, n *negroni.Negroni, s beer.UseCase) {
 	)).Methods("DELETE", "OPTIONS")
 }
 
+func formatJson(w hhtp.ResponseWriter, message interface{}, status int){
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+
+	json.NewEncoder(w).Encode(message)
+}
+
+formatError(w http.ResponseWriter, err error, code int){
+	formatJson(w, map[string]string{"error": err.String()})
+}
+
 func getAllBeer(service beer.UseCase) http.Handler{
 	return http.HandlerFunc(w http.ResponseWriter, r *http.Request){
-		
+		all, err := service.GetBeer()
+		if err != nil {
+			formatError(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		formatJson(w, all, http.StatusOK)
 	}
 }

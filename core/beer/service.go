@@ -1,9 +1,9 @@
-package beer 
+package beer
 
 import (
-
-	"errors"
 	"database/sql"
+	"errors"
+
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -15,20 +15,19 @@ type UseCase interface {
 	Remove(ID int64) error
 }
 
-
 type Service struct {
 	DB *sql.DB
 }
 
-// NewService return one pointer to sruct Service  
+// NewService return one pointer to sruct Service
 func NewService(db *sql.DB) *Service {
 	return &Service{
 		DB: db,
 	}
 }
 
-// GetAll return array Adress memory Beer 
-func(s *Service) GetAll() ([]*Beer, error) {
+// GetAll return array Adress memory Beer
+func (s *Service) GetAll() ([]*Beer, error) {
 	var result []*Beer
 
 	rows, err := s.DB.Query("select id, name, type, style from beer")
@@ -41,7 +40,7 @@ func(s *Service) GetAll() ([]*Beer, error) {
 	for rows.Next() {
 		var b Beer
 
-		err = rows.Scan(&b.ID, &b.Name, &b.Type, &b.style)
+		err = rows.Scan(&b.ID, &b.Name, &b.Type, &b.Style)
 		if err != nil {
 			return nil, err
 		}
@@ -52,7 +51,7 @@ func(s *Service) GetAll() ([]*Beer, error) {
 	return result, nil
 }
 
-func(s *Service) Get(ID int) (*Beer, error) {
+func (s *Service) Get(ID int) (*Beer, error) {
 	var b Beer
 
 	stmt, err := s.DB.Prepare("select id, name, type, style from beer where id = ?")
@@ -62,7 +61,7 @@ func(s *Service) Get(ID int) (*Beer, error) {
 
 	defer stmt.Close()
 
-	err = stmt.QueryRow(ID).Scan(&b.ID, &B.Name, &b.Type, &b.style)
+	err = stmt.QueryRow(ID).Scan(&b.ID, &b.Name, &b.Type, &b.Style)
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +69,7 @@ func(s *Service) Get(ID int) (*Beer, error) {
 	return &b, nil
 }
 
-func(s *Service) Store(b *Beer) error {
+func (s *Service) Store(b *Beer) error {
 	tx, err := s.DB.Begin()
 	if err != nil {
 		return err
@@ -81,29 +80,7 @@ func(s *Service) Store(b *Beer) error {
 		return err
 	}
 
-	_, err := stmt.Exec(b.ID, b.Name, b.Type, b.Style)
-	if err != nil {
-		tx.Rollback()
-		return err
-	}
-
-	tx.Commit()
-
-	return nil
-} 
-
-func(s *Service) Update(b *Beer) error {
-	tx, err := s.DB.Begin()
-	if err != nil {
-		return err
-	}
-
-	stmt, err := tx.Prepare("update beer set name=?, type=?, style=? where id=? ")
-	if err != nil {
-		return err
-	}
-
-	_, err := stmt.Exec(b.ID, b.Name, b.Type, b.Style)
+	_, err = stmt.Exec(b.ID, b.Name, b.Type, b.Style)
 	if err != nil {
 		tx.Rollback()
 		return err
@@ -114,7 +91,29 @@ func(s *Service) Update(b *Beer) error {
 	return nil
 }
 
-func(s *Service) Remove(ID int) error {
+func (s *Service) Update(b *Beer) error {
+	tx, err := s.DB.Begin()
+	if err != nil {
+		return err
+	}
+
+	stmt, err := tx.Prepare("update beer set name=?, type=?, style=? where id=? ")
+	if err != nil {
+		return err
+	}
+
+	_, err = stmt.Exec(b.ID, b.Name, b.Type, b.Style)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	tx.Commit()
+
+	return nil
+}
+
+func (s *Service) Remove(ID int) error {
 	if ID == 0 {
 		return errors.New("Invalid ID")
 	}
@@ -124,13 +123,13 @@ func(s *Service) Remove(ID int) error {
 		return err
 	}
 
-	_, err := tx.Prepare("delete from beer where id=?", ID)
+	_, err = tx.Prepare("delete from beer where id=?", ID)
 	if err != nil {
 		tx.Rollback()
 		return err
 	}
 
 	tx.Commit()
-	
+
 	return nil
 }

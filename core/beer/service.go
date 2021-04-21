@@ -123,7 +123,7 @@ func (s *Service) Remove(ID int) error {
 		return err
 	}
 
-	_, err = tx.Prepare("delete from beer where id=?", ID)
+	_, err = tx.Exec("delete from beer where id=?", ID)
 	if err != nil {
 		tx.Rollback()
 		return err

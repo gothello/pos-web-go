@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+	"text/template"
 
 	"github.com/gorilla/mux"
 	"github.com/gothello/pos-web-go/core/beer"
@@ -76,13 +77,50 @@ func getAllBeer(service beer.UseCase) http.Handler {
 
 func getAllBeerJSON(w http.ResponseWriter, service beer.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("getAllBeerJson"))
+		all, err := service.GetAll()
+		if err != nil {
+			formatError(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		formatJson(w, all, http.StatusOK)
 	})
 }
 
 func getAllBeerHTML(w http.ResponseWriter, service beer.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("getAllBeerHTML"))
+		w.Header().Set("Content-Type", "text/html")
+
+		ts, err := template.ParseFiles(
+			"./web/templates/header.html",
+			"/web/templates/index.html",
+			"/web/templates/footer.html",
+		)
+
+		if err != nil {
+			formatError(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		all, err := service.GetAll()
+		if err != nil {
+			formatError(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		data := struct {
+			Title string
+			Beers []*beer.Beer
+		}{
+			Title: "Beers",
+			Beers: all,
+		}
+
+		err = ts.Lookup("index.html").ExecuteTemplate(w, "index", data)
+		if err != nil {
+			formatError(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 	})
 }
 

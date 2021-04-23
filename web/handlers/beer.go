@@ -11,23 +11,23 @@ import (
 )
 
 func GetBeerHandlers(r *mux.Router, n *negroni.Negroni, service beer.UseCase) {
-	n.Handle("/v1/beer", n.With(
+	r.Handle("/v1/beer", n.With(
 		negroni.Wrap(getAllBeer(service)),
 	)).Methods("GET", "OPTIONS")
 
-	n.Handle("/v1/beer/{id}", n.With(
+	r.Handle("/v1/beer/{id}", n.With(
 		negroni.Wrap(getBeer(service)),
 	)).Methods("GET", "OPTIONS")
 
-	n.Handle("/v1/beer", n.With(
+	r.Handle("/v1/beer", n.With(
 		negroni.Wrap(storeBeer(service)),
 	)).Methods("POST", "OPTIONS")
 
-	n.Handle("/v1/beer/{id}", n.With(
+	r.Handle("/v1/beer/{id}", n.With(
 		negroni.Wrap(updateBeer(service)),
 	)).Methods("PUT", "OPTIONS")
 
-	n.Handle("/v1/beer/{id}", n.With(
+	r.Handle("/v1/beer/{id}", n.With(
 		negroni.Wrap(removeBeer(service)),
 	)).Methods("DELETE", "OPTIONS")
 }
@@ -65,13 +65,24 @@ func getBeer(service beer.UseCase) http.Handler {
 
 func getAllBeer(service beer.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		all, err := service.GetAll()
-		if err != nil {
-			formatError(w, err.Error(), http.StatusInternalServerError)
-			return
+		switch r.Header.Get("Accept") {
+		case "application/json":
+			getAllBeerJSON(w, service)
+		default:
+			getAllBeerHTML(w, service)
 		}
+	})
+}
 
-		formatJson(w, all, http.StatusOK)
+func getAllBeerJSON(w http.ResponseWriter, service beer.UseCase) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("getAllBeerJson"))
+	})
+}
+
+func getAllBeerHTML(w http.ResponseWriter, service beer.UseCase) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("getAllBeerHTML"))
 	})
 }
 

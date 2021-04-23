@@ -6,7 +6,6 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
-	"github.com/gothello/pos-web-go/beer"
 	"github.com/gothello/pos-web-go/core/beer"
 	"github.com/urfave/negroni"
 )
@@ -66,7 +65,7 @@ func getBeer(service beer.UseCase) http.Handler {
 
 func getAllBeer(service beer.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		all, err := service.GetBeer()
+		all, err := service.GetAll()
 		if err != nil {
 			formatError(w, err.Error(), http.StatusInternalServerError)
 			return
